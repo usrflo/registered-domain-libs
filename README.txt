@@ -8,6 +8,12 @@ They include recent representations of the effective TLD list available at
 http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1
 and help to convert an arbitrary domain name to the registered domain name.
 
+Sample use:
+dkim-reputation.org blocks signing domains on the level of registered domains
+to rate senders who use e.g. a.spamdomain.tld, b.spamdomain.tld, ... under
+the most common identifier - the registered domain - finally.
+Project page: http://www.dkim-reputation.org/regdom-libs/
+
 Pseudo code:
 registeredDomain = getRegisteredDomain(ingoingDomain);
 
@@ -47,4 +53,4 @@ php generateEffectiveTLDs.php c    > C/tld-canon.h
 # </@LICENSE>
 
 
-Florian Sager, 2009-02-05, sager@agitos.de
+Florian Sager, 2009-02-05, sager@agitos.de, http://www.agitos.de

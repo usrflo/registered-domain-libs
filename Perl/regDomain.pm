@@ -15,7 +15,7 @@
 # limitations under the License.
 # </@LICENSE>
 #
-# Florian Sager, 2009-01-11, sager@agitos.de
+# Florian Sager, 2009-01-11, sager@agitos.de, http://www.agitos.de
 #
 
 package regDomain;

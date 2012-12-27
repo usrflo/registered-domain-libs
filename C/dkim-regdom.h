@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  *
- * Florian Sager, 03.01.2009, sager@agitos.de
+ * Florian Sager, 03.01.2009, sager@agitos.de, http://www.agitos.de
  * Ward van Wanrooij, 04.04.2010, ward@ward.nu
  *
  */

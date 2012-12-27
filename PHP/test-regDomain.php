@@ -20,7 +20,7 @@
  * limitations under the License.
  * </@LICENSE>
  *
- * Florian Sager, 25.07.2008, sager@agitos.de
+ * Florian Sager, 25.07.2008, sager@agitos.de, http://www.agitos.de
  */
 
 require_once("effectiveTLDs.inc.php");

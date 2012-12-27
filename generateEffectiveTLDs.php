@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Florian Sager, 06.08.2008, sager@agitos.de
+ * Florian Sager, 06.08.2008, sager@agitos.de, http://www.agitos.de
  *
  * Auto-Generate PHP array tree that contains all TLDs from the URL (see below);
  * The output has to be copied to reputation-libs/effectiveTLDs.inc.php
