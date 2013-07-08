@@ -14,8 +14,8 @@ clean:
 	rm -f $(OBJECTS)
 
 install: libregdom.so
-	cp libregdom.so $PREFIX/lib
-	cp dkim-regdom.h $PREFIX/include
+	cp libregdom.so $(PREFIX)/lib
+	cp dkim-regdom.h $(PREFIX)/include
 
 $(EXECUTABLE): $(SOURCES)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) $(LDFLAGS)
@@ -25,4 +25,3 @@ dkim-regdom.o: dkim-regdom.c dkim-regdom.h
 
 $(LIBRARY): $(OBJECTS)
 	$(CC) -shared -o $@ $(OBJECTS)
-
