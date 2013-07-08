@@ -4,6 +4,7 @@ SOURCES=test-dkim-regdom.c dkim-regdom.c dkim-regdom.h tld-canon.h
 EXECUTABLE=test-dkim-regdom
 OBJECTS=dkim-regdom.o
 LIBRARY=libregdom.so
+PREFIX=/usr/local
 
 all: $(EXECUTABLE) $(LIBRARY)
 
@@ -11,6 +12,10 @@ clean:
 	rm -f $(EXECUTABLE)
 	rm -f $(LIBRARY)
 	rm -f $(OBJECTS)
+
+install: libregdom.so
+	cp libregdom.so $PREFIX/lib
+	cp dkim-regdom.h $PREFIX/include
 
 $(EXECUTABLE): $(SOURCES)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) $(LDFLAGS)
@@ -20,3 +25,4 @@ dkim-regdom.o: dkim-regdom.c dkim-regdom.h
 
 $(LIBRARY): $(OBJECTS)
 	$(CC) -shared -o $@ $(OBJECTS)
+
