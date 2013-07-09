@@ -72,7 +72,7 @@ int readTldString(tldnode* node, char* s, int len, int pos) {
 				if (c==':') {
 					char* buf = (char*) malloc((pos - start - 1) + 1);
 					memcpy(buf, s+start+1, pos - start - 1);
-					buf[pos - start - 1] = 0;				
+					buf[pos - start - 1] = 0;
 					node->num_children = atoi(buf);
 					free(buf);
 
@@ -136,6 +136,7 @@ void freeTldTree(tldnode* node) {
 			freeTldTree(node->subnodes[i]);
 		}
 	}
+	free(node->subnodes);
 	free(node->dom);
 	free(node);
 }
