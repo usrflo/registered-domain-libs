@@ -214,7 +214,7 @@ void freeDomLabels(dlist* head, char* sDcopy) {
 char* getRegisteredDomain(char* signingDomain, tldnode* tree) {
 
     dlist *cur, *head = NULL;
-    char *saveptr;
+    char *saveptr = NULL;
     char *result = NULL;
 
     // split domain by . separator
