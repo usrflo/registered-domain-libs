@@ -254,7 +254,7 @@ freeDomLabels(dlist* head, char* sDcopy)
 }
 
 static char*
-getRegisteredDomainDropI(char* signingDomain, tldnode* tree, int drop_unknown)
+getRegisteredDomainDropI(const char* hostname, tldnode* tree, int drop_unknown)
 {
 
     dlist *cur, *head = NULL;
@@ -262,8 +262,8 @@ getRegisteredDomainDropI(char* signingDomain, tldnode* tree, int drop_unknown)
     char *result = NULL;
 
     // split domain by . separator
-    char* sDcopy = (char*) malloc(strlen(signingDomain)+1);
-    strcpy(sDcopy, signingDomain);
+    char* sDcopy = (char*) malloc(strlen(hostname)+1);
+    strcpy(sDcopy, hostname);
     char* token = strtok_r(sDcopy, ".", &saveptr);
     while (token != NULL) {
         cur = (dlist*) malloc(sizeof(dlist));
@@ -281,7 +281,7 @@ getRegisteredDomainDropI(char* signingDomain, tldnode* tree, int drop_unknown)
         return NULL;
     }
 
-    // assure there is at least 1 TLD in the stripped signing domain
+    // assure there is at least 1 TLD in the stripped domain
     if (strchr(result, '.')==NULL) {
         free(result);
         if (head->next == NULL) {
@@ -302,13 +302,13 @@ getRegisteredDomainDropI(char* signingDomain, tldnode* tree, int drop_unknown)
 }
 
 char*
-getRegisteredDomainDrop(char* signingDomain, void* tree, int drop_unknown)
+getRegisteredDomainDrop(const char *hostname, void* tree, int drop_unknown)
 {
-  return getRegisteredDomainDropI(signingDomain, (tldnode *)tree, drop_unknown);
+  return getRegisteredDomainDropI(hostname, (tldnode *)tree, drop_unknown);
 }
 
 char*
-getRegisteredDomain(char* signingDomain, void* tree)
+getRegisteredDomain(const char *hostname, void* tree)
 {
-  return getRegisteredDomainDropI(signingDomain, (tldnode *)tree, 0);
+  return getRegisteredDomainDropI(hostname, (tldnode *)tree, 0);
 }

@@ -29,8 +29,8 @@ extern void *loadTldTree(void);
 extern void freeTldTree(void *tree);
 extern void printTldTree(void *tree, const char *prefix);
 
-extern char *getRegisteredDomain(char *hostname, void *tree);
-extern char *getRegisteredDomainDrop(char *hostname, void *tree,
+extern char *getRegisteredDomain(const char *hostname, void *tree);
+extern char *getRegisteredDomainDrop(const char *hostname, void *tree,
                                      int drop_unknown);
 
 #endif /*_DKIM_REGDOM_H_*/
