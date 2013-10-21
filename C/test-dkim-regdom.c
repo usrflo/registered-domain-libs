@@ -72,12 +72,17 @@ main(int argc, char **argv)
                 error = 1;
             }
             else
+            {
                 printf("%s: %s\n", argv[i], result);
+                free(result);
+            }
         }
     }
 
     // This call is not strictly necessary, but, again, we want to make
-    // sure to call all the library interfaces.
+    // sure to call all the library interfaces.  Also, it facilitates
+    // running this program under valgrind to make sure the library does
+    // not leak memory when used correctly.
     freeTldTree(tree);
     return error;
 }
