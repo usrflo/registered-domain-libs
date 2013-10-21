@@ -1,7 +1,7 @@
 
 CC     = gcc
 CFLAGS = -g -O2 -std=c99 -D_POSIX_C_SOURCE=200112L \
-	 -pedantic -Wall -Wextra -Werror \
+	 -pedantic -Wall -Wextra -Werror -Wwrite-strings \
 	 -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs \
 	 -Wredundant-decls -Wcast-qual -Wcast-align -Winline \
 	 -Wno-unused-parameter -Wno-overlength-strings

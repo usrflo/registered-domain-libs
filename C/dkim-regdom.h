@@ -26,7 +26,7 @@
 /* DATA TYPES */
 struct tldnode_el {
 	char* dom;
-	char* attr;
+	const char* attr;
 
 	int num_children;
 	struct tldnode_el** subnodes;
@@ -35,7 +35,7 @@ struct tldnode_el {
 typedef struct tldnode_el tldnode;
 
 struct dlist_el {
-	char* val;
+	const char* val;
 
 	struct dlist_el* next;
 };
@@ -43,12 +43,12 @@ struct dlist_el {
 typedef struct dlist_el dlist;
 
 /* PROTOTYPES */
-extern int readTldString(tldnode*,char*,int,int);
-extern tldnode* findTldNode(tldnode*,char*);
-extern char* concatDomLabel(char*,char*);
+extern int readTldString(tldnode*, const char*,int,int);
+extern tldnode* findTldNode(tldnode*, const char*);
+extern char* concatDomLabel(const char*, const char*);
 extern char* findRegisteredDomain(tldnode*,dlist*);
 extern void freeDomLabels(dlist*,char*);
-extern tldnode* readTldTree(char*);
+extern tldnode* readTldTree(const char*);
 extern char* getRegisteredDomain(char*,tldnode*);
 extern char* getRegisteredDomainDrop(char*,tldnode*,int);
 extern void freeTldTree(tldnode*);

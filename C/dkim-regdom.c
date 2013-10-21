@@ -28,13 +28,11 @@
 
 #include "dkim-regdom.h"
 
-static char* ALL = "*";
-static char* THIS = "!";
-
-// char* tldString = "root(3:ac(5:com,edu,gov,net,ad(3:nom,co!,*)),de,com)";
+static const char ALL[] = "*";
+static const char THIS[] = "!";
 
 // helper function to parse node in tldString
-int readTldString(tldnode* node, char* s, int len, int pos) {
+int readTldString(tldnode* node, const char* s, int len, int pos) {
 
     int start = pos;
     int state = 0;
@@ -98,7 +96,7 @@ int readTldString(tldnode* node, char* s, int len, int pos) {
 }
 
 // reads TLDs once at daemon startup
-tldnode* readTldTree(char* tlds) {
+tldnode* readTldTree(const char* tlds) {
     tldnode* root = (tldnode *)malloc(sizeof(tldnode));
 
     readTldString(root, tlds, strlen(tlds), 0);
@@ -142,7 +140,7 @@ void freeTldTree(tldnode* node) {
 }
 
 // linear search for domain (and * if available)
-tldnode* findTldNode(tldnode* parent, char* subdom) {
+tldnode* findTldNode(tldnode* parent, const char* subdom) {
 
     tldnode* allNode = NULL;
 
@@ -159,7 +157,7 @@ tldnode* findTldNode(tldnode* parent, char* subdom) {
 }
 
 // concatenate a domain with its parent domain
-char* concatDomLabel(char* dl, char* du) {
+char* concatDomLabel(const char* dl, const char* du) {
 
     char* s;
 
