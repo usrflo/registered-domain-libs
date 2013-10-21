@@ -34,7 +34,7 @@ struct tldnode
 {
     char *dom;
     const char *attr;
-    int num_children;
+    unsigned int num_children;
     struct tldnode **subnodes;
 };
 typedef struct tldnode tldnode;
@@ -103,8 +103,7 @@ readTldString(tldnode *node, const char *s, int len, int pos)
                 node->subnodes =
                     malloc(node->num_children * sizeof(tldnode *));
 
-                int i;
-                for (i = 0; i < node->num_children; i++)
+                for (unsigned int i = 0; i < node->num_children; i++)
                 {
                     node->subnodes[i] = malloc(sizeof(tldnode));
                     pos = readTldString(node->subnodes[i], s, len, pos + 1);
@@ -140,8 +139,7 @@ printTldTreeI(tldnode *node, const char *spacer)
         // has children
         printf("%s%s:\n", spacer, node->dom);
 
-        int i;
-        for (i = 0; i < node->num_children; i++)
+        for (unsigned int i = 0; i < node->num_children; i++)
         {
             char dest[100];
             sprintf(dest, "  %s", spacer);
@@ -165,7 +163,7 @@ printTldTree(void *node, const char *spacer)
 static void
 freeTldTreeI(tldnode *node)
 {
-    for (int i = 0; i < node->num_children; i++)
+    for (unsigned int i = 0; i < node->num_children; i++)
         freeTldTreeI(node->subnodes[i]);
     free(node->subnodes);
     free(node->dom);
@@ -184,8 +182,7 @@ findTldNode(tldnode *parent, const char *subdom)
 {
     tldnode *allNode = 0;
 
-    int i;
-    for (i = 0; i < parent->num_children; i++)
+    for (unsigned int i = 0; i < parent->num_children; i++)
     {
         if (!strcmp(subdom, parent->subnodes[i]->dom))
             return parent->subnodes[i];
