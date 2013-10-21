@@ -30,25 +30,21 @@
 
 /* data types */
 
-struct tldnode_el
+struct tldnode
 {
     char *dom;
     const char *attr;
-
     int num_children;
-    struct tldnode_el **subnodes;
+    struct tldnode **subnodes;
 };
+typedef struct tldnode tldnode;
 
-typedef struct tldnode_el tldnode;
-
-struct dlist_el
+struct dlist
 {
     const char *val;
-
-    struct dlist_el *next;
+    struct dlist *next;
 };
-
-typedef struct dlist_el dlist;
+typedef struct dlist dlist;
 
 /* static data */
 
@@ -59,7 +55,7 @@ static const char THIS[] = "!";
 
 // helper function to parse node in tldString
 static int
-readTldString(tldnode * node, const char *s, int len, int pos)
+readTldString(tldnode *node, const char *s, int len, int pos)
 {
     int start = pos;
     int state = 0;
@@ -67,19 +63,18 @@ readTldString(tldnode * node, const char *s, int len, int pos)
     memset(node, 0, sizeof(tldnode));
     do
     {
-        char c = *(s + pos);
+        char c = s[pos];
 
         switch (state)
         {
-        case 0:                // general read
-
+        case 0: // general read
             if (c == ',' || c == ')' || c == '(')
             {
                 // add last domain
                 int lenc = node->attr == THIS ? pos - start - 1 : pos - start;
-                node->dom = (char *) malloc(lenc + 1);
+                node->dom = malloc(lenc + 1);
                 memcpy(node->dom, s + start, lenc);
-                (node->dom)[lenc] = 0;
+                node->dom[lenc] = 0;
 
                 if (c == '(')
                 {
@@ -88,23 +83,17 @@ readTldString(tldnode * node, const char *s, int len, int pos)
                     state = 1;
                 }
                 else if (c == ')' || c == ',')
-                {
                     // return to parent domains
                     return pos;
-                }
-
             }
             else if (c == '!')
-            {
                 node->attr = THIS;
-            }
-
             break;
-        case 1:                // reading number of elements (<number>:
 
+        case 1: // reading number of elements (<number>:
             if (c == ':')
             {
-                char *buf = (char *) malloc((pos - start - 1) + 1);
+                char *buf = malloc((pos - start - 1) + 1);
                 memcpy(buf, s + start + 1, pos - start - 1);
                 buf[pos - start - 1] = 0;
                 node->num_children = atoi(buf);
@@ -117,16 +106,14 @@ readTldString(tldnode * node, const char *s, int len, int pos)
                 int i;
                 for (i = 0; i < node->num_children; i++)
                 {
-                    node->subnodes[i] = (tldnode *) malloc(sizeof(tldnode));
+                    node->subnodes[i] = malloc(sizeof(tldnode));
                     pos = readTldString(node->subnodes[i], s, len, pos + 1);
                 }
 
                 return pos + 1;
             }
-
             break;
         }
-
         pos++;
     }
     while (pos < len);
@@ -138,7 +125,7 @@ readTldString(tldnode * node, const char *s, int len, int pos)
 void *
 loadTldTree(void)
 {
-    tldnode *root = (tldnode *) malloc(sizeof(tldnode));
+    tldnode *root = malloc(sizeof(tldnode));
 
     readTldString(root, tldString, sizeof tldString - 1, 0);
 
@@ -146,7 +133,7 @@ loadTldTree(void)
 }
 
 static void
-printTldTreeI(tldnode * node, const char *spacer)
+printTldTreeI(tldnode *node, const char *spacer)
 {
     if (node->num_children != 0)
     {
@@ -176,16 +163,10 @@ printTldTree(void *node, const char *spacer)
 }
 
 static void
-freeTldTreeI(tldnode * node)
+freeTldTreeI(tldnode *node)
 {
-    if (node->num_children != 0)
-    {
-        int i;
-        for (i = 0; i < node->num_children; i++)
-        {
-            freeTldTree(node->subnodes[i]);
-        }
-    }
+    for (int i = 0; i < node->num_children; i++)
+        freeTldTreeI(node->subnodes[i]);
     free(node->subnodes);
     free(node->dom);
     free(node);
@@ -199,21 +180,18 @@ freeTldTree(void *root)
 
 // linear search for domain (and * if available)
 static tldnode *
-findTldNode(tldnode * parent, const char *subdom)
+findTldNode(tldnode *parent, const char *subdom)
 {
-    tldnode *allNode = NULL;
+    tldnode *allNode = 0;
 
     int i;
     for (i = 0; i < parent->num_children; i++)
     {
-        if (strcmp(subdom, parent->subnodes[i]->dom) == 0)
-        {
+        if (!strcmp(subdom, parent->subnodes[i]->dom))
             return parent->subnodes[i];
-        }
-        if (allNode == NULL && strcmp(ALL, parent->subnodes[i]->dom) == 0)
-        {
+
+        if (!allNode && !strcmp(ALL, parent->subnodes[i]->dom))
             allNode = parent->subnodes[i];
-        }
     }
     return allNode;
 }
@@ -225,14 +203,14 @@ concatDomLabel(const char *dl, const char *du)
 
     char *s;
 
-    if (dl == NULL)
+    if (!dl)
     {
-        s = (char *) malloc(strlen(du) + 1);
+        s = malloc(strlen(du) + 1);
         strcpy(s, du);
     }
     else
     {
-        s = (char *) malloc(strlen(dl) + 1 + strlen(du) + 1);
+        s = malloc(strlen(dl) + 1 + strlen(du) + 1);
         strcpy(s, dl);
         strcat(s, ".");
         strcat(s, du);
@@ -242,36 +220,31 @@ concatDomLabel(const char *dl, const char *du)
 
 // recursive helper method
 static char *
-findRegisteredDomain(tldnode * subtree, dlist * dom)
+findRegisteredDomain(tldnode *subtree, dlist *dom)
 {
     tldnode *subNode = findTldNode(subtree, dom->val);
-    if (subNode == NULL
+    if (!subNode
         || (subNode->num_children == 1 && subNode->subnodes[0]->attr == THIS))
     {
-        char *domain = (char *) malloc(strlen(dom->val) + 1);
+        char *domain = malloc(strlen(dom->val) + 1);
         strcpy(domain, dom->val);
         return domain;
     }
-    else if (dom->next == NULL)
-    {
-        return NULL;
-    }
+    else if (!dom->next)
+        return 0;
 
     char *fRegDom = findRegisteredDomain(subNode, dom->next);
-    char *concDomain = NULL;
-    if (fRegDom != NULL)
-    {
-        concDomain = concatDomLabel(fRegDom, dom->val);
-        free(fRegDom);
-    }
+    if (!fRegDom)
+        return fRegDom;
 
+    char *concDomain = concatDomLabel(fRegDom, dom->val);
+    free(fRegDom);
     return concDomain;
 }
 
 static void
-freeDomLabels(dlist * head, char *sDcopy)
+freeDomLabels(dlist *head, char *sDcopy)
 {
-
     dlist *cur;
 
     // free list of separated domain parts
@@ -286,47 +259,47 @@ freeDomLabels(dlist * head, char *sDcopy)
 }
 
 static char *
-getRegisteredDomainDropI(const char *hostname, tldnode * tree,
+getRegisteredDomainDropI(const char *hostname, tldnode *tree,
                          int drop_unknown)
 {
 
-    dlist *cur, *head = NULL;
-    char *saveptr = NULL;
-    char *result = NULL;
+    dlist *cur, *head = 0;
+    char *saveptr = 0;
+    char *result = 0;
 
     // split domain by . separator
-    char *sDcopy = (char *) malloc(strlen(hostname) + 1);
+    char *sDcopy = malloc(strlen(hostname) + 1);
     strcpy(sDcopy, hostname);
     char *token = strtok_r(sDcopy, ".", &saveptr);
-    while (token != NULL)
+    while (token)
     {
-        cur = (dlist *) malloc(sizeof(dlist));
+        cur = malloc(sizeof(dlist));
         cur->val = token;
         cur->next = head;
         head = cur;
-        token = strtok_r(NULL, ".", &saveptr);
+        token = strtok_r(0, ".", &saveptr);
     }
 
-    if (head != NULL)
+    if (head)
         result = findRegisteredDomain(tree, head);
 
-    if (result == NULL)
+    if (!result)
     {
         freeDomLabels(head, sDcopy);
-        return NULL;
+        return 0;
     }
 
     // assure there is at least 1 TLD in the stripped domain
-    if (strchr(result, '.') == NULL)
+    if (!strchr(result, '.'))
     {
         free(result);
-        if (head->next == NULL)
+        if (!head->next)
         {
             freeDomLabels(head, sDcopy);
-            return NULL;
+            return 0;
         }
         else if (drop_unknown)
-            return NULL;
+            return 0;
         else
         {
             char *minDomain = concatDomLabel(head->next->val, head->val);
