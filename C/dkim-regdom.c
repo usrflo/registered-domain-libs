@@ -237,8 +237,6 @@ char* getRegisteredDomainDrop(char* signingDomain, tldnode* tree, int drop_unkno
         return NULL;
     }
 
-    printf("%s\n",result);
-
     // assure there is at least 1 TLD in the stripped signing domain
     if (strchr(result, '.')==NULL) {
         free(result);
