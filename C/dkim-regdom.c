@@ -28,12 +28,37 @@
 
 #include "dkim-regdom.h"
 
+/* data types */
+
+struct tldnode_el {
+	char* dom;
+	const char* attr;
+
+	int num_children;
+	struct tldnode_el** subnodes;
+};
+
+typedef struct tldnode_el tldnode;
+
+struct dlist_el {
+	const char* val;
+
+	struct dlist_el* next;
+};
+
+typedef struct dlist_el dlist;
+
+/* static data */
+
+#include "tld-canon.h"
+
 static const char ALL[] = "*";
 static const char THIS[] = "!";
 
 // helper function to parse node in tldString
-int readTldString(tldnode* node, const char* s, int len, int pos) {
-
+static int
+readTldString(tldnode* node, const char* s, int len, int pos)
+{
     int start = pos;
     int state = 0;
 
@@ -95,16 +120,20 @@ int readTldString(tldnode* node, const char* s, int len, int pos) {
     return pos;
 }
 
-// reads TLDs once at daemon startup
-tldnode* readTldTree(const char* tlds) {
+// Read TLD string into fast-lookup data structure
+void *
+loadTldTree(void)
+{
     tldnode* root = (tldnode *)malloc(sizeof(tldnode));
 
-    readTldString(root, tlds, strlen(tlds), 0);
+    readTldString(root, tldString, sizeof tldString - 1, 0);
 
     return root;
 }
 
-void printTldTree(tldnode* node, const char * spacer) {
+static void
+printTldTreeI(tldnode* node, const char * spacer)
+{
     if (node->num_children != 0) {
         // has children
         printf("%s%s:\n", spacer, node->dom);
@@ -114,7 +143,7 @@ void printTldTree(tldnode* node, const char * spacer) {
             char dest[100];
             sprintf(dest, "  %s", spacer);
 
-            printTldTree(node->subnodes[i], dest);
+            printTldTreeI(node->subnodes[i], dest);
         }
     } else {
         // no children
@@ -122,8 +151,15 @@ void printTldTree(tldnode* node, const char * spacer) {
     }
 }
 
-void freeTldTree(tldnode* node) {
+void
+printTldTree(void *node, const char *spacer)
+{
+  printTldTreeI((tldnode *)node, spacer);
+}
 
+static void
+freeTldTreeI(tldnode* node)
+{
     if (node->num_children != 0) {
         int i;
         for(i = 0; i < node->num_children; i++) {
@@ -135,9 +171,16 @@ void freeTldTree(tldnode* node) {
     free(node);
 }
 
-// linear search for domain (and * if available)
-tldnode* findTldNode(tldnode* parent, const char* subdom) {
+void
+freeTldTree(void *root)
+{
+  freeTldTreeI((tldnode *)root);
+}
 
+// linear search for domain (and * if available)
+static tldnode*
+findTldNode(tldnode* parent, const char* subdom)
+{
     tldnode* allNode = NULL;
 
     int i;
@@ -153,7 +196,9 @@ tldnode* findTldNode(tldnode* parent, const char* subdom) {
 }
 
 // concatenate a domain with its parent domain
-char* concatDomLabel(const char* dl, const char* du) {
+static char*
+concatDomLabel(const char* dl, const char* du)
+{
 
     char* s;
 
@@ -170,8 +215,9 @@ char* concatDomLabel(const char* dl, const char* du) {
 }
 
 // recursive helper method
-char* findRegisteredDomain(tldnode* subtree, dlist* dom) {
-
+static char*
+findRegisteredDomain(tldnode* subtree, dlist* dom)
+{
     tldnode* subNode = findTldNode(subtree, dom->val);
     if (subNode==NULL || (subNode->num_children==1 && subNode->subnodes[0]->attr == THIS)) {
         char* domain = (char*) malloc(strlen(dom->val)+1);
@@ -191,7 +237,9 @@ char* findRegisteredDomain(tldnode* subtree, dlist* dom) {
     return concDomain;
 }
 
-void freeDomLabels(dlist* head, char* sDcopy) {
+static void
+freeDomLabels(dlist* head, char* sDcopy)
+{
 
     dlist* cur;
 
@@ -205,7 +253,9 @@ void freeDomLabels(dlist* head, char* sDcopy) {
     free(sDcopy);
 }
 
-char* getRegisteredDomainDrop(char* signingDomain, tldnode* tree, int drop_unknown) {
+static char*
+getRegisteredDomainDropI(char* signingDomain, tldnode* tree, int drop_unknown)
+{
 
     dlist *cur, *head = NULL;
     char *saveptr = NULL;
@@ -251,6 +301,14 @@ char* getRegisteredDomainDrop(char* signingDomain, tldnode* tree, int drop_unkno
     return result;
 }
 
-char* getRegisteredDomain(char* signingDomain, tldnode* tree) {
-    return getRegisteredDomainDrop(signingDomain, tree, 0);
+char*
+getRegisteredDomainDrop(char* signingDomain, void* tree, int drop_unknown)
+{
+  return getRegisteredDomainDropI(signingDomain, (tldnode *)tree, drop_unknown);
+}
+
+char*
+getRegisteredDomain(char* signingDomain, void* tree)
+{
+  return getRegisteredDomainDropI(signingDomain, (tldnode *)tree, 0);
 }

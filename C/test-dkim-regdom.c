@@ -20,44 +20,64 @@
  *
  */
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "dkim-regdom.h"
-#include "tld-canon.h"
 
-int main(int argc, char* argv[]) {
+int
+main(int argc, char **argv)
+{
+    if (argc==1)
+    {
+        fprintf(stderr, "%s [--drop-unknown] "
+                "<(fully-qualified-domain-name )+>\n",
+                argv[0]);
+        fprintf(stderr, "%s --dump\n",
+                argv[0]);
+        return 2;
+    }
 
-	if (argc==1) {
-		fprintf(stderr, "%s <(fully-qualified-domain-name )+>\n",
-                        argv[0]);
-		fprintf(stderr, "%s --dump\n",
-                        argv[0]);
-		return 2;
-	}
+    void *tree = loadTldTree();
+    int error = 0;
 
-	// read TLDs only once at daemon startup
-	tldnode* tree = readTldTree(tldString);
+    if (!strcmp(argv[1], "--dump"))
+        printTldTree(tree, "");
+    else
+    {
+        int drop_unknown = 0;
+        int i = 1;
+        char *result;
 
-        if (!strcmp(argv[1], "--dump")) {
-		printTldTree(tree, "");
-                return 0;
+        if (!strcmp(argv[1], "--drop-unknown"))
+        {
+            i++;
+            drop_unknown = 1;
         }
 
-	// strip subdomains from every signing domain
-	// char dom[] = "sub2.sub.registered.nom.ad";
-	int i;
-	for (i=1; i<argc; i++) {
-		char* result = getRegisteredDomain((char*) argv[i], tree);
+        // strip subdomains from every FQDN on the command line
+        for (; i < argc; i++)
+        {
+            // we do it this way so that this test program will call
+            // all of the library interfaces
+            if (drop_unknown)
+                result = getRegisteredDomainDrop(argv[i], tree, 1);
+            else
+                result = getRegisteredDomain(argv[i], tree);
 
-		if (result==NULL) {
-			printf("error: %s\n", argv[i]);
-		} else {
-			printf("%s\n", result);
-		}
-		fflush(stdout);
-	}
+            if (!result)
+            {
+                printf("%s: error\n", argv[i]);
+                error = 1;
+            }
+            else
+                printf("%s: %s\n", argv[i], result);
+        }
+    }
 
-	return 0;
+    // This call is not strictly necessary, but, again, we want to make
+    // sure to call all the library interfaces.
+    freeTldTree(tree);
+    return error;
 }

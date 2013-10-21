@@ -8,8 +8,8 @@ CFLAGS = -g -O2 -std=c99 -D_POSIX_C_SOURCE=200112L \
 
 SOURCES    = test-dkim-regdom.c dkim-regdom.c dkim-regdom.h tld-canon.h
 EXECUTABLE = test-dkim-regdom
-OBJECTS    = dkim-regdom.o
-LIBRARY    = libregdom.so
+OBJECTS    = dkim-regdom.o test-dkim-regdom.o
+LIBRARY    = libregdom.so.1
 
 # autoconf-compatible installation directory variables
 prefix      = /usr/local
@@ -24,15 +24,17 @@ clean:
 	rm -f $(LIBRARY)
 	rm -f $(OBJECTS)
 
-install: libregdom.so
-	cp libregdom.so $(libdir)
+install: $(LIBRARY) dkim-regdom.h
+	cp $(LIBRARY) $(libdir)
+	cd $(libdir) && ln -s $(LIBRARY) libregdom.so
 	cp dkim-regdom.h $(includedir)
 
-$(EXECUTABLE): $(SOURCES)
-	$(CC) $(CFLAGS) -o $@ $(SOURCES) $(LDFLAGS)
+$(EXECUTABLE): test-dkim-regdom.o $(LIBRARY)
+	$(CC) $(CFLAGS) -o $@ $^
 
-dkim-regdom.o: dkim-regdom.c dkim-regdom.h
-	$(CC) $(CFLAGS) -fPIC -o dkim-regdom.o -c dkim-regdom.c
+$(LIBRARY): dkim-regdom.o
+	$(CC) -shared -Wl,-soname,$@ -o $@ $^
 
-$(LIBRARY): $(OBJECTS)
-	$(CC) -shared -o $@ $(OBJECTS)
+test-dkim-regdom.o: test-dkim-regdom.c dkim-regdom.h
+dkim-regdom.o: dkim-regdom.c dkim-regdom.h tld-canon.h
+dkim-regdom.o: CFLAGS += -fPIC

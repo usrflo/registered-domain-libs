@@ -23,35 +23,14 @@
 #ifndef _DKIM_REGDOM_H_
 #define _DKIM_REGDOM_H_
 
-/* DATA TYPES */
-struct tldnode_el {
-	char* dom;
-	const char* attr;
+/* public API */
 
-	int num_children;
-	struct tldnode_el** subnodes;
-};
+extern void *loadTldTree(void);
+extern void freeTldTree(void *tree);
+extern void printTldTree(void *tree, const char *prefix);
 
-typedef struct tldnode_el tldnode;
-
-struct dlist_el {
-	const char* val;
-
-	struct dlist_el* next;
-};
-
-typedef struct dlist_el dlist;
-
-/* PROTOTYPES */
-extern int readTldString(tldnode*, const char*,int,int);
-extern tldnode* findTldNode(tldnode*, const char*);
-extern char* concatDomLabel(const char*, const char*);
-extern char* findRegisteredDomain(tldnode*,dlist*);
-extern void freeDomLabels(dlist*,char*);
-extern tldnode* readTldTree(const char*);
-extern char* getRegisteredDomain(char*,tldnode*);
-extern char* getRegisteredDomainDrop(char*,tldnode*,int);
-extern void freeTldTree(tldnode*);
-extern void printTldTree(tldnode*, const char *);
+extern char *getRegisteredDomain(char *hostname, void *tree);
+extern char *getRegisteredDomainDrop(char *hostname, void *tree,
+                                     int drop_unknown);
 
 #endif /*_DKIM_REGDOM_H_*/
