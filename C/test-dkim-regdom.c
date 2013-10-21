@@ -30,18 +30,20 @@
 int main(int argc, char* argv[]) {
 
 	if (argc==1) {
-		printf("%s <(fully-qualified-domain-name )+>\n", argv[0]);
-		return 0;
+		fprintf(stderr, "%s <(fully-qualified-domain-name )+>\n",
+                        argv[0]);
+		fprintf(stderr, "%s --dump\n",
+                        argv[0]);
+		return 2;
 	}
 
 	// read TLDs only once at daemon startup
 	tldnode* tree = readTldTree(tldString);
 
-	#ifdef DEBUG
-	// this is for debug output only
-	printTldTree(tree, "");
-	printf("---\n\n");
-	#endif /* DEBUG */
+        if (!strcmp(argv[1], "--dump")) {
+		printTldTree(tree, "");
+                return 0;
+        }
 
 	// strip subdomains from every signing domain
 	// char dom[] = "sub2.sub.registered.nom.ad";
@@ -56,9 +58,6 @@ int main(int argc, char* argv[]) {
 		}
 		fflush(stdout);
 	}
-
-	// free only once before daemon exit
-	freeTldTree(tree);
 
 	return 0;
 }

@@ -104,8 +104,6 @@ tldnode* readTldTree(const char* tlds) {
     return root;
 }
 
-#ifdef DEBUG
-
 void printTldTree(tldnode* node, const char * spacer) {
     if (node->num_children != 0) {
         // has children
@@ -123,8 +121,6 @@ void printTldTree(tldnode* node, const char * spacer) {
         printf("%s%s: %s\n", spacer, node->dom, node->attr);
     }
 }
-
-#endif /* DEBUG */
 
 void freeTldTree(tldnode* node) {
 

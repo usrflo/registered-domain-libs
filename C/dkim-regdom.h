@@ -52,9 +52,6 @@ extern tldnode* readTldTree(const char*);
 extern char* getRegisteredDomain(char*,tldnode*);
 extern char* getRegisteredDomainDrop(char*,tldnode*,int);
 extern void freeTldTree(tldnode*);
-
-#ifdef DEBUG
 extern void printTldTree(tldnode*, const char *);
-#endif /* DEBUG */
 
 #endif /*_DKIM_REGDOM_H_*/
