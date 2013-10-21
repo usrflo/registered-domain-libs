@@ -50,6 +50,7 @@ extern char* findRegisteredDomain(tldnode*,dlist*);
 extern void freeDomLabels(dlist*,char*);
 extern tldnode* readTldTree(char*);
 extern char* getRegisteredDomain(char*,tldnode*);
+extern char* getRegisteredDomainDrop(char*,tldnode*,int);
 extern void freeTldTree(tldnode*);
 
 #ifdef DEBUG

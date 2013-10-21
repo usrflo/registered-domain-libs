@@ -211,7 +211,7 @@ void freeDomLabels(dlist* head, char* sDcopy) {
     free(sDcopy);
 }
 
-char* getRegisteredDomain(char* signingDomain, tldnode* tree) {
+char* getRegisteredDomainDrop(char* signingDomain, tldnode* tree, int drop_unknown) {
 
     dlist *cur, *head = NULL;
     char *saveptr = NULL;
@@ -237,13 +237,18 @@ char* getRegisteredDomain(char* signingDomain, tldnode* tree) {
         return NULL;
     }
 
+    printf("%s\n",result);
+
     // assure there is at least 1 TLD in the stripped signing domain
     if (strchr(result, '.')==NULL) {
         free(result);
         if (head->next == NULL) {
             freeDomLabels(head, sDcopy);
             return NULL;
-        } else {
+        }
+        else if (drop_unknown)
+            return NULL;
+        else {
             char* minDomain = concatDomLabel(head->next->val, head->val);
             freeDomLabels(head, sDcopy);
             return minDomain;
@@ -252,4 +257,8 @@ char* getRegisteredDomain(char* signingDomain, tldnode* tree) {
 
     freeDomLabels(head, sDcopy);
     return result;
+}
+
+char* getRegisteredDomain(char* signingDomain, tldnode* tree) {
+    return getRegisteredDomainDrop(signingDomain, tree, 0);
 }
