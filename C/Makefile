@@ -1,10 +1,21 @@
-CC=gcc
-CFLAGS=-g -O2 -Wall -Werror -Wextra -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith -Wreturn-type -Wcast-qual -Wswitch -Wshadow -Wcast-align -Wno-unused-parameter -Wchar-subscripts -Winline -Wnested-externs -Wredundant-decls
-SOURCES=test-dkim-regdom.c dkim-regdom.c dkim-regdom.h tld-canon.h
-EXECUTABLE=test-dkim-regdom
-OBJECTS=dkim-regdom.o
-LIBRARY=libregdom.so
-PREFIX=/usr/local
+
+CC     = gcc
+CFLAGS = -g -O2 -std=c99 -D_POSIX_C_SOURCE=200112L \
+	 -pedantic -Wall -Wextra -Werror \
+	 -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs \
+	 -Wredundant-decls -Wcast-qual -Wcast-align -Winline \
+	 -Wno-unused-parameter -Wno-overlength-strings
+
+SOURCES    = test-dkim-regdom.c dkim-regdom.c dkim-regdom.h tld-canon.h
+EXECUTABLE = test-dkim-regdom
+OBJECTS    = dkim-regdom.o
+LIBRARY    = libregdom.so
+
+# autoconf-compatible installation directory variables
+prefix      = /usr/local
+exec_prefix = $(prefix)
+libdir      = $(exec_prefix)/lib
+includedir  = $(prefix)/include
 
 all: $(EXECUTABLE) $(LIBRARY)
 
@@ -14,8 +25,8 @@ clean:
 	rm -f $(OBJECTS)
 
 install: libregdom.so
-	cp libregdom.so $(PREFIX)/lib
-	cp dkim-regdom.h $(PREFIX)/include
+	cp libregdom.so $(libdir)
+	cp dkim-regdom.h $(includedir)
 
 $(EXECUTABLE): $(SOURCES)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) $(LDFLAGS)
