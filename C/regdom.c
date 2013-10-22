@@ -40,102 +40,104 @@
 
 struct tldnode
 {
-    char *dom;
     unsigned int num_children : CHILDREN_BITS;
-    char attr; // ALL, THIS, or zero
-    struct tldnode **subnodes;
+    char attr;    // ALL, THIS, or zero
+    char label[];
 };
 typedef struct tldnode tldnode;
+
+// The subnodes of a tldnode with children are stored in memory locations
+// immediately before the node header.  This allows us to allocate the
+// node header, label, and child vector in one go.
+#define subnodes(tn) ((tldnode **)(tn) - (tn)->num_children)
 
 /* static data */
 
 #include "tld-canon.h"
 
-// helper function to parse node in tldString
-static int
-readTldString(tldnode *node, const char *s, int len, int pos)
+// Recursively construct a search tree from the string pointed-to by 'dptr'.
+static tldnode *
+parseTldNode(const char **dptr)
 {
-    int start = pos;
-    int state = 0;
+    tldnode *rv;
+    const char *p = *dptr;
+    const char *name, *nend;
+    unsigned long nchildren;
 
-    memset(node, 0, sizeof(tldnode));
-    do
+    // When we are called, the first thing at '*dptr' will be either
+    // a name token (terminated by one of ',' '(' ')') or one of the
+    // special characters '*' or '!'.
+    if (p[0] == ALL || p[0] == THIS)
     {
-        char c = s[pos];
+        // Special characters must be immediately followed by ',' or ')'.
+        // They are not allowed to have subnodes.
+        if (p[1] != ',' && p[1] != ')')
+            abort();
+        rv = malloc(sizeof(tldnode));
+        rv->num_children = 0;
+        rv->attr = p[0];
 
-        switch (state)
-        {
-        case 0: // general read
-            if (c == ',' || c == ')' || c == '(')
-            {
-                // add last domain
-                int lenc = node->attr ? pos - start - 1 : pos - start;
-                node->dom = malloc(lenc + 1);
-                memcpy(node->dom, s + start, lenc);
-                node->dom[lenc] = 0;
-
-                if (c == '(')
-                {
-                    // read number of children
-                    start = pos;
-                    state = 1;
-                }
-                else if (c == ')' || c == ',')
-                    // return to parent domains
-                    return pos;
-            }
-            else if (c == ALL || c == THIS)
-                node->attr = c;
-            break;
-
-        case 1: // reading number of elements (<number>:
-            if (c == ':')
-            {
-                char *endptr;
-                errno = 0;
-                unsigned long n = strtoul(s + start + 1, &endptr, 10);
-                if (endptr != s + pos || errno || n > CHILDREN_MAX)
-                    abort();
-
-                node->num_children = n;
-
-                // allocate space for children
-                node->subnodes = malloc(n * sizeof(tldnode *));
-                for (unsigned long i = 0; i < n; i++)
-                {
-                    node->subnodes[i] = malloc(sizeof(tldnode));
-                    pos = readTldString(node->subnodes[i], s, len, pos + 1);
-                }
-
-                return pos + 1;
-            }
-            break;
-        }
-        pos++;
+        *dptr = p + 1; // leave cursor pointing at ',' / ')'
     }
-    while (pos < len);
+    else
+    {
+        name = p;
+        nend = p = p + strcspn(p, "(),");
+        if (name == nend || *nend == '\0')
+            abort();
+        if (*p == '(')
+        {
+            char *endptr;
+            errno = 0;
+            nchildren = strtoul(p+1, &endptr, 10);
+            if (endptr == p+1 || *endptr != ':' || errno
+                || nchildren > CHILDREN_MAX)
+                abort();
+            p = endptr + 1;
+        }
+        else
+            nchildren = 0;
 
-    return pos;
+        rv = (tldnode *)((char *)malloc(sizeof(tldnode) +
+                                        nchildren*sizeof(tldnode *) +
+                                        (nend - name + 1))
+                         + nchildren * sizeof(tldnode *));
+
+        rv->num_children = nchildren;
+        rv->attr = '\0';
+        memcpy(rv->label, name, nend - name);
+        rv->label[nend-name] = '\0';
+
+        *dptr = p;
+        for (unsigned long i = 0; i < nchildren; i++)
+        {
+            subnodes(rv)[i] = parseTldNode(dptr);
+            if (**dptr != ((i == nchildren-1) ? ')' : ','))
+                abort();
+            (*dptr)++;
+        }
+    }
+    return rv;
 }
 
 // Read TLD string into fast-lookup data structure
 void *
 loadTldTree(void)
 {
-    tldnode *root = malloc(sizeof(tldnode));
-
-    readTldString(root, tldString, sizeof tldString - 1, 0);
-
-    return root;
+    const char *data = tldString;
+    void *rv = parseTldNode(&data);
+    // Should have consumed the entire string.
+    if (*data) abort();
+    return rv;
 }
 
 static void
 printTldTreeI(tldnode *node, const char *spacer)
 {
     if (node->attr)
-        printf("%s%s: %c\n", spacer, node->dom, node->attr);
+        printf("%s%s: %c\n", spacer, node->label, node->attr);
     else
-        printf("%s%s:\n", spacer, node->dom);
+        printf("%s%s:\n", spacer, node->label);
 
     if (node->num_children > 0)
     {
@@ -147,7 +149,7 @@ printTldTreeI(tldnode *node, const char *spacer)
         nspacer[n+2] = '\0';
 
         for (unsigned int i = 0; i < node->num_children; i++)
-            printTldTreeI(node->subnodes[i], nspacer);
+            printTldTreeI(subnodes(node)[i], nspacer);
     }
 }
 
@@ -163,10 +165,10 @@ static void
 freeTldTreeI(tldnode *node)
 {
     for (unsigned int i = 0; i < node->num_children; i++)
-        freeTldTreeI(node->subnodes[i]);
-    free(node->subnodes);
-    free(node->dom);
-    free(node);
+        freeTldTreeI(subnodes(node)[i]);
+    // subnodes(node), by itself, is the pointer originally received from
+    // malloc.
+    free(subnodes(node));
 }
 
 void
@@ -183,14 +185,14 @@ findTldNode(tldnode *parent, const char *seg_start, const char *seg_end)
 
     for (unsigned int i = 0; i < parent->num_children; i++)
     {
-        if (!allNode && parent->subnodes[i]->attr == ALL)
-            allNode = parent->subnodes[i];
+        if (!allNode && subnodes(parent)[i]->attr == ALL)
+            allNode = subnodes(parent)[i];
         else
         {
             size_t m = seg_end - seg_start;
-            size_t n = strlen(parent->subnodes[i]->dom);
-            if (m == n && !memcmp(parent->subnodes[i]->dom, seg_start, n))
-                return parent->subnodes[i];
+            size_t n = strlen(subnodes(parent)[i]->label);
+            if (m == n && !memcmp(subnodes(parent)[i]->label, seg_start, n))
+                return subnodes(parent)[i];
         }
     }
     return allNode;
@@ -224,7 +226,7 @@ getRegisteredDomainDropI(const char *hostname, tldnode *tree,
         tldnode *subtree = findTldNode(tree, seg_start, seg_end);
         if (!subtree
             || (subtree->num_children == 1
-                && subtree->subnodes[0]->attr == THIS))
+                && subnodes(subtree)[0]->attr == THIS))
             // Match found.
             break;
 
