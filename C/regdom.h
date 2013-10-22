@@ -27,10 +27,10 @@
 
 extern void *loadTldTree(void);
 extern void freeTldTree(void *tree);
-extern void printTldTree(void *tree, const char *prefix);
+extern void printTldTree(const void *tree, const char *prefix);
 
-extern char *getRegisteredDomain(const char *hostname, void *tree);
-extern char *getRegisteredDomainDrop(const char *hostname, void *tree,
+extern char *getRegisteredDomain(const char *hostname, const void *tree);
+extern char *getRegisteredDomainDrop(const char *hostname, const void *tree,
                                      int drop_unknown);
 
 #endif /*_REGDOM_H_*/

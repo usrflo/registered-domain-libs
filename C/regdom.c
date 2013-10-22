@@ -49,7 +49,8 @@ typedef struct tldnode tldnode;
 // The subnodes of a tldnode with children are stored in memory locations
 // immediately before the node header.  This allows us to allocate the
 // node header, label, and child vector in one go.
-#define subnodes(tn) ((tldnode **)(tn) - (tn)->num_children)
+#define subnodes(tn) ((const tldnode *const *)(tn) - (tn)->num_children)
+#define subnodes_w(tn) ((tldnode **)(tn) - (tn)->num_children)
 
 /* static data */
 
@@ -111,7 +112,7 @@ parseTldNode(const char **dptr)
         *dptr = p;
         for (unsigned long i = 0; i < nchildren; i++)
         {
-            subnodes(rv)[i] = parseTldNode(dptr);
+            subnodes_w(rv)[i] = parseTldNode(dptr);
             if (**dptr != ((i == nchildren-1) ? ')' : ','))
                 abort();
             (*dptr)++;
@@ -132,7 +133,7 @@ loadTldTree(void)
 }
 
 static void
-printTldTreeI(tldnode *node, const char *spacer)
+printTldTreeI(const tldnode *node, const char *spacer)
 {
     if (node->attr)
         printf("%s%s: %c\n", spacer, node->label, node->attr);
@@ -154,21 +155,21 @@ printTldTreeI(tldnode *node, const char *spacer)
 }
 
 void
-printTldTree(void *node, const char *spacer)
+printTldTree(const void *node, const char *spacer)
 {
     if (!spacer)
         spacer = "";
-    printTldTreeI((tldnode *) node, spacer);
+    printTldTreeI((const tldnode *) node, spacer);
 }
 
 static void
 freeTldTreeI(tldnode *node)
 {
     for (unsigned int i = 0; i < node->num_children; i++)
-        freeTldTreeI(subnodes(node)[i]);
+        freeTldTreeI(subnodes_w(node)[i]);
     // subnodes(node), by itself, is the pointer originally received from
     // malloc.
-    free(subnodes(node));
+    free(subnodes_w(node));
 }
 
 void
@@ -178,10 +179,10 @@ freeTldTree(void *root)
 }
 
 // linear search for domain (and * if available)
-static tldnode *
-findTldNode(tldnode *parent, const char *seg_start, const char *seg_end)
+static const tldnode *
+findTldNode(const tldnode *parent, const char *seg_start, const char *seg_end)
 {
-    tldnode *allNode = 0;
+    const tldnode *allNode = 0;
 
     for (unsigned int i = 0; i < parent->num_children; i++)
     {
@@ -199,7 +200,7 @@ findTldNode(tldnode *parent, const char *seg_start, const char *seg_end)
 }
 
 static char *
-getRegisteredDomainDropI(const char *hostname, tldnode *tree,
+getRegisteredDomainDropI(const char *hostname, const tldnode *tree,
                          int drop_unknown)
 {
     // Eliminate some special (always-fail) cases first.
@@ -223,7 +224,7 @@ getRegisteredDomainDropI(const char *hostname, tldnode *tree,
             seg_start++;
 
         // [seg_start, seg_end) is one label.
-        tldnode *subtree = findTldNode(tree, seg_start, seg_end);
+        const tldnode *subtree = findTldNode(tree, seg_start, seg_end);
         if (!subtree
             || (subtree->num_children == 1
                 && subnodes(subtree)[0]->attr == THIS))
@@ -264,13 +265,15 @@ getRegisteredDomainDropI(const char *hostname, tldnode *tree,
 }
 
 char *
-getRegisteredDomainDrop(const char *hostname, void *tree, int drop_unknown)
+getRegisteredDomainDrop(const char *hostname, const void *tree,
+                        int drop_unknown)
 {
-    return getRegisteredDomainDropI(hostname, (tldnode *) tree, drop_unknown);
+    return getRegisteredDomainDropI(hostname, (const tldnode *) tree,
+                                    drop_unknown);
 }
 
 char *
-getRegisteredDomain(const char *hostname, void *tree)
+getRegisteredDomain(const char *hostname, const void *tree)
 {
-    return getRegisteredDomainDropI(hostname, (tldnode *) tree, 0);
+    return getRegisteredDomainDropI(hostname, (const tldnode *) tree, 0);
 }
