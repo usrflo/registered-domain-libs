@@ -197,20 +197,24 @@ findTldNode(tldnode *parent, const char *subdom)
 static char *
 concatDomLabel(const char *dl, const char *du)
 {
-
     char *s;
+    size_t ll, lu;
 
     if (!dl)
     {
-        s = malloc(strlen(du) + 1);
-        strcpy(s, du);
+        lu = strlen(du) + 1;
+        s = malloc(lu);
+        memcpy(s, du, lu);
     }
     else
     {
-        s = malloc(strlen(dl) + 1 + strlen(du) + 1);
-        strcpy(s, dl);
-        strcat(s, ".");
-        strcat(s, du);
+        lu = strlen(du);
+        ll = strlen(dl);
+        s = malloc(lu + ll + 2);
+        memcpy(s, dl, ll);
+        s[ll] = '.';
+        memcpy(s + ll + 1, du, lu);
+        s[ll + lu + 1] = '\0';
     }
     return s;
 }
@@ -223,8 +227,9 @@ findRegisteredDomain(tldnode *subtree, dlist *dom)
     if (!subNode
         || (subNode->num_children == 1 && subNode->subnodes[0]->attr == THIS))
     {
-        char *domain = malloc(strlen(dom->val) + 1);
-        strcpy(domain, dom->val);
+        size_t vlen = strlen(dom->val) + 1;
+        char *domain = malloc(vlen);
+        memcpy(domain, dom->val, vlen);
         return domain;
     }
     else if (!dom->next)
