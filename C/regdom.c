@@ -22,19 +22,27 @@
  *
  */
 
-#include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "regdom.h"
 
 /* data types */
 
+#define ALL    '*'
+#define THIS   '!'
+
+#define CHILDREN_BITS (sizeof(unsigned int)*CHAR_BIT - CHAR_BIT)
+#define CHILDREN_MAX  ((1ul << CHILDREN_BITS) - 1)
+
 struct tldnode
 {
     char *dom;
-    const char *attr;
-    unsigned int num_children;
+    unsigned int num_children : CHILDREN_BITS;
+    char attr; // ALL, THIS, or zero
     struct tldnode **subnodes;
 };
 typedef struct tldnode tldnode;
@@ -42,9 +50,6 @@ typedef struct tldnode tldnode;
 /* static data */
 
 #include "tld-canon.h"
-
-static const char ALL[] = "*";
-static const char THIS[] = "!";
 
 // helper function to parse node in tldString
 static int
@@ -64,7 +69,7 @@ readTldString(tldnode *node, const char *s, int len, int pos)
             if (c == ',' || c == ')' || c == '(')
             {
                 // add last domain
-                int lenc = node->attr == THIS ? pos - start - 1 : pos - start;
+                int lenc = node->attr ? pos - start - 1 : pos - start;
                 node->dom = malloc(lenc + 1);
                 memcpy(node->dom, s + start, lenc);
                 node->dom[lenc] = 0;
@@ -79,24 +84,24 @@ readTldString(tldnode *node, const char *s, int len, int pos)
                     // return to parent domains
                     return pos;
             }
-            else if (c == '!')
-                node->attr = THIS;
+            else if (c == ALL || c == THIS)
+                node->attr = c;
             break;
 
         case 1: // reading number of elements (<number>:
             if (c == ':')
             {
-                char *buf = malloc((pos - start - 1) + 1);
-                memcpy(buf, s + start + 1, pos - start - 1);
-                buf[pos - start - 1] = 0;
-                node->num_children = atoi(buf);
-                free(buf);
+                char *endptr;
+                errno = 0;
+                unsigned long n = strtoul(s + start + 1, &endptr, 10);
+                if (endptr != s + pos || errno || n > CHILDREN_MAX)
+                    abort();
+
+                node->num_children = n;
 
                 // allocate space for children
-                node->subnodes =
-                    malloc(node->num_children * sizeof(tldnode *));
-
-                for (unsigned int i = 0; i < node->num_children; i++)
+                node->subnodes = malloc(n * sizeof(tldnode *));
+                for (unsigned long i = 0; i < n; i++)
                 {
                     node->subnodes[i] = malloc(sizeof(tldnode));
                     pos = readTldString(node->subnodes[i], s, len, pos + 1);
@@ -127,29 +132,30 @@ loadTldTree(void)
 static void
 printTldTreeI(tldnode *node, const char *spacer)
 {
-    if (node->num_children != 0)
-    {
-        // has children
+    if (node->attr)
+        printf("%s%s: %c\n", spacer, node->dom, node->attr);
+    else
         printf("%s%s:\n", spacer, node->dom);
 
-        for (unsigned int i = 0; i < node->num_children; i++)
-        {
-            char dest[100];
-            sprintf(dest, "  %s", spacer);
-
-            printTldTreeI(node->subnodes[i], dest);
-        }
-    }
-    else
+    if (node->num_children > 0)
     {
-        // no children
-        printf("%s%s: %s\n", spacer, node->dom, node->attr);
+        size_t n = strlen(spacer);
+        char nspacer[n+2+1];
+        memcpy(nspacer, spacer, n);
+        nspacer[n]   = ' ';
+        nspacer[n+1] = ' ';
+        nspacer[n+2] = '\0';
+
+        for (unsigned int i = 0; i < node->num_children; i++)
+            printTldTreeI(node->subnodes[i], nspacer);
     }
 }
 
 void
 printTldTree(void *node, const char *spacer)
 {
+    if (!spacer)
+        spacer = "";
     printTldTreeI((tldnode *) node, spacer);
 }
 
@@ -177,7 +183,7 @@ findTldNode(tldnode *parent, const char *seg_start, const char *seg_end)
 
     for (unsigned int i = 0; i < parent->num_children; i++)
     {
-        if (!allNode && !strcmp(parent->subnodes[i]->dom, ALL))
+        if (!allNode && parent->subnodes[i]->attr == ALL)
             allNode = parent->subnodes[i];
         else
         {
