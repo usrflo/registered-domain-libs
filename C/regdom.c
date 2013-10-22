@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "dkim-regdom.h"
+#include "regdom.h"
 
 /* data types */
 

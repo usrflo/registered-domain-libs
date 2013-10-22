@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _DKIM_REGDOM_H_
-#define _DKIM_REGDOM_H_
+#ifndef _REGDOM_H_
+#define _REGDOM_H_
 
 /* public API */
 
@@ -33,4 +33,4 @@ extern char *getRegisteredDomain(const char *hostname, void *tree);
 extern char *getRegisteredDomainDrop(const char *hostname, void *tree,
                                      int drop_unknown);
 
-#endif /*_DKIM_REGDOM_H_*/
+#endif /*_REGDOM_H_*/

@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "dkim-regdom.h"
+#include "regdom.h"
 
 int
 main(int argc, char **argv)

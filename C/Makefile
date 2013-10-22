@@ -6,9 +6,9 @@ CFLAGS = -g -O2 -std=c99 -D_POSIX_C_SOURCE=200112L \
 	 -Wredundant-decls -Wcast-qual -Wcast-align -Winline \
 	 -Wno-unused-parameter -Wno-overlength-strings
 
-SOURCES    = test-dkim-regdom.c dkim-regdom.c dkim-regdom.h tld-canon.h
-EXECUTABLE = test-dkim-regdom
-OBJECTS    = dkim-regdom.o test-dkim-regdom.o
+SOURCES    = test-regdom.c regdom.c regdom.h tld-canon.h
+EXECUTABLE = test-regdom
+OBJECTS    = regdom.o test-regdom.o
 LIBRARY    = libregdom.so.1
 
 # autoconf-compatible installation directory variables
@@ -24,17 +24,17 @@ clean:
 	rm -f $(LIBRARY)
 	rm -f $(OBJECTS)
 
-install: $(LIBRARY) dkim-regdom.h
+install: $(LIBRARY) regdom.h
 	cp $(LIBRARY) $(libdir)
 	cd $(libdir) && ln -s $(LIBRARY) libregdom.so
-	cp dkim-regdom.h $(includedir)
+	cp regdom.h $(includedir)
 
-$(EXECUTABLE): test-dkim-regdom.o $(LIBRARY)
+$(EXECUTABLE): test-regdom.o $(LIBRARY)
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(LIBRARY): dkim-regdom.o
+$(LIBRARY): regdom.o
 	$(CC) -shared -Wl,-soname,$@ -o $@ $^
 
-test-dkim-regdom.o: test-dkim-regdom.c dkim-regdom.h
-dkim-regdom.o: dkim-regdom.c dkim-regdom.h tld-canon.h
-dkim-regdom.o: CFLAGS += -fPIC
+test-regdom.o: test-regdom.c regdom.h
+regdom.o: regdom.c regdom.h tld-canon.h
+regdom.o: CFLAGS += -fPIC

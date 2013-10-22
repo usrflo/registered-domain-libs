@@ -84,9 +84,9 @@ www.test.k12.ak.us: test.k12.ak.us
 "
 
 if [ x"$1" = x"--grind" ]; then
-    CMD="valgrind ./test-dkim-regdom"
+    CMD="valgrind ./test-regdom"
 else
-    CMD="./test-dkim-regdom"
+    CMD="./test-regdom"
 fi
 
 expected=$(mktemp expected.XXXXXX)
