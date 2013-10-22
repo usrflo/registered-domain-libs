@@ -72,10 +72,7 @@ main(int argc, char **argv)
                 error = 1;
             }
             else
-            {
                 printf("%s: %s\n", argv[i], result);
-                free(result);
-            }
         }
     }
 

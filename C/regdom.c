@@ -39,13 +39,6 @@ struct tldnode
 };
 typedef struct tldnode tldnode;
 
-struct dlist
-{
-    const char *val;
-    struct dlist *next;
-};
-typedef struct dlist dlist;
-
 /* static data */
 
 #include "tld-canon.h"
@@ -178,140 +171,88 @@ freeTldTree(void *root)
 
 // linear search for domain (and * if available)
 static tldnode *
-findTldNode(tldnode *parent, const char *subdom)
+findTldNode(tldnode *parent, const char *seg_start, const char *seg_end)
 {
     tldnode *allNode = 0;
 
     for (unsigned int i = 0; i < parent->num_children; i++)
     {
-        if (!strcmp(subdom, parent->subnodes[i]->dom))
-            return parent->subnodes[i];
-
-        if (!allNode && !strcmp(ALL, parent->subnodes[i]->dom))
+        if (!allNode && !strcmp(parent->subnodes[i]->dom, ALL))
             allNode = parent->subnodes[i];
+        else
+        {
+            size_t m = seg_end - seg_start;
+            size_t n = strlen(parent->subnodes[i]->dom);
+            if (m == n && !memcmp(parent->subnodes[i]->dom, seg_start, n))
+                return parent->subnodes[i];
+        }
     }
     return allNode;
-}
-
-// concatenate a domain with its parent domain
-static char *
-concatDomLabel(const char *dl, const char *du)
-{
-    char *s;
-    size_t ll, lu;
-
-    if (!dl)
-    {
-        lu = strlen(du) + 1;
-        s = malloc(lu);
-        memcpy(s, du, lu);
-    }
-    else
-    {
-        lu = strlen(du);
-        ll = strlen(dl);
-        s = malloc(lu + ll + 2);
-        memcpy(s, dl, ll);
-        s[ll] = '.';
-        memcpy(s + ll + 1, du, lu);
-        s[ll + lu + 1] = '\0';
-    }
-    return s;
-}
-
-// recursive helper method
-static char *
-findRegisteredDomain(tldnode *subtree, dlist *dom)
-{
-    tldnode *subNode = findTldNode(subtree, dom->val);
-    if (!subNode
-        || (subNode->num_children == 1 && subNode->subnodes[0]->attr == THIS))
-    {
-        size_t vlen = strlen(dom->val) + 1;
-        char *domain = malloc(vlen);
-        memcpy(domain, dom->val, vlen);
-        return domain;
-    }
-    else if (!dom->next)
-        return 0;
-
-    char *fRegDom = findRegisteredDomain(subNode, dom->next);
-    if (!fRegDom)
-        return fRegDom;
-
-    char *concDomain = concatDomLabel(fRegDom, dom->val);
-    free(fRegDom);
-    return concDomain;
-}
-
-static void
-freeDomLabels(dlist *head, char *sDcopy)
-{
-    dlist *cur;
-
-    // free list of separated domain parts
-    while (head)
-    {
-        cur = head;
-        head = cur->next;
-        free(cur);
-    }
-
-    free(sDcopy);
 }
 
 static char *
 getRegisteredDomainDropI(const char *hostname, tldnode *tree,
                          int drop_unknown)
 {
-
-    dlist *cur, *head = 0;
-    char *saveptr = 0;
-    char *result = 0;
-
-    // split domain by . separator
-    char *sDcopy = malloc(strlen(hostname) + 1);
-    strcpy(sDcopy, hostname);
-    char *token = strtok_r(sDcopy, ".", &saveptr);
-    while (token)
-    {
-        cur = malloc(sizeof(dlist));
-        cur->val = token;
-        cur->next = head;
-        head = cur;
-        token = strtok_r(0, ".", &saveptr);
-    }
-
-    if (head)
-        result = findRegisteredDomain(tree, head);
-
-    if (!result)
-    {
-        freeDomLabels(head, sDcopy);
+    // Eliminate some special (always-fail) cases first.
+    if (hostname[0] == '.' || hostname[0] == '\0')
         return 0;
+
+    // The registered domain will always be a suffix of the input hostname.
+    // Start at the end of the name and work backward.
+    const char *head = hostname;
+    const char *seg_end = hostname + strlen(hostname);
+    const char *seg_start;
+
+    if (seg_end[-1] == '.')
+        seg_end--;
+    seg_start = seg_end;
+
+    for (;;) {
+        while (seg_start > head && *seg_start != '.')
+            seg_start--;
+        if (*seg_start == '.')
+            seg_start++;
+
+        // [seg_start, seg_end) is one label.
+        tldnode *subtree = findTldNode(tree, seg_start, seg_end);
+        if (!subtree
+            || (subtree->num_children == 1
+                && subtree->subnodes[0]->attr == THIS))
+            // Match found.
+            break;
+
+        if (seg_start == head)
+            // No match, i.e. the input name is too short to be a
+            // registered domain.
+            return 0;
+
+        // Advance to the next label.
+        tree = subtree;
+
+        if (seg_start[-1] != '.')
+            abort();
+        seg_end = seg_start - 1;
+        seg_start = seg_end - 1;
     }
 
-    // assure there is at least 1 TLD in the stripped domain
-    if (!strchr(result, '.'))
+    // Ensure the stripped domain contains at least two labels.
+    if (!strchr(seg_start, '.'))
     {
-        free(result);
-        if (!head->next)
-        {
-            freeDomLabels(head, sDcopy);
+        if (seg_start == head || drop_unknown)
             return 0;
-        }
-        else if (drop_unknown)
-            return 0;
-        else
-        {
-            char *minDomain = concatDomLabel(head->next->val, head->val);
-            freeDomLabels(head, sDcopy);
-            return minDomain;
-        }
+
+        seg_start -= 2;
+        while (seg_start > head && *seg_start != '.')
+            seg_start--;
+        if (*seg_start == '.')
+            seg_start++;
     }
 
-    freeDomLabels(head, sDcopy);
-    return result;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
+    return (char *)seg_start;
+#pragma GCC diagnostic pop
 }
 
 char *
