@@ -197,7 +197,7 @@ $tldTree = array(
 
 if ($format == "c") {
 
-	echo "char* tldString = \"";
+	echo "static const char tldString[] = \"";
 	printNode_C("root", $tldTree);
 	echo "\";\n\n";
 

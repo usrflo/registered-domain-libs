@@ -17,7 +17,7 @@
 // ao : http://en.wikipedia.org/wiki/.ao
 // http://www.dns.ao/REGISTR.DOC
 // aq : http://en.wikipedia.org/wiki/.aq
-// ar : http://en.wikipedia.org/wiki/.ar
+// ar : https://nic.ar/normativa-vigente.xhtml
 // arpa : http://en.wikipedia.org/wiki/.arpa
 // Confirmed by registry <iana-questions@icann.org> 2008-06-18
 // as : http://en.wikipedia.org/wiki/.as
@@ -282,7 +282,6 @@
 // net : http://en.wikipedia.org/wiki/.net
 // nf : http://en.wikipedia.org/wiki/.nf
 // ng : http://psg.com/dns/ng/
-// Submitted by registry <randy@psg.com> 2008-06-17
 // ni : http://www.nic.ni/dominios.htm
 // nl : http://www.domain-registry.nl/ace.php/c,728,122,,,,Home.html
 // Confirmed by registry <Antoin.Verschuren@sidn.nl> (with technical
@@ -370,7 +369,7 @@
 // sr : http://en.wikipedia.org/wiki/.sr
 // st : http://www.nic.st/html/policyrules/
 // su : http://en.wikipedia.org/wiki/.su
-// sv : http://www.svnet.org.sv/svpolicy.html
+// sv : http://www.svnet.org.sv/niveldos.pdf
 // sx : http://en.wikipedia.org/wiki/.sx
 // Confirmed by registry <jcvignes@openregistry.com> 2012-05-31
 // sy : http://en.wikipedia.org/wiki/.sy
@@ -527,6 +526,65 @@
 // za : http://www.zadna.org.za/slds.html
 // zm : http://en.wikipedia.org/wiki/.zm
 // zw : http://en.wikipedia.org/wiki/.zw
+// xn--80asehdb : 2013-07-14 CORE Association
+// xn--80aswg : 2013-07-14 CORE Association
+// xn--ngbc5azd : 2013-07-14 International Domain Registry Pty. Ltd.
+// xn--unup4y : 2013-07-14 Spring Fields, LLC
+// xn--vhquv : 2013-08-28 Dash McCook, LLC
+// camera : 2013-08-28 Atomic Maple, LLC
+// clothing : 2013-08-28 Steel Lake, LLC
+// lighting : 2013-08-28 John McCook, LLC
+// singles : 2013-08-28 Fern Madison, LLC
+// ventures : 2013-08-28 Binky Lake, LLC
+// voyage : 2013-08-28 Ruby House, LLC
+// guru : 2013-08-28 Pioneer Cypress, LLC
+// holdings : 2013-08-28 John Madison, LLC
+// equipment : 2013-08-28 Corn Station, LLC
+// bike : 2013-08-28 Grand Hollow, LLC
+// estate : 2013-08-28 Trixy Park, LLC
+// tattoo : 2013-08-30 Uniregistry,Corp.
+// xn--3ds443g : 2013-09-09 TLD Registry Limited
+// xn--fiq228c5hs : 2013-09-09 TLD Registry Limited
+// land : 2013-09-10 Pine Moon, LLC 
+// plumbing : 2013-09-10 Spring Tigers, LLC 
+// contractors : 2013-09-10 Magic Woods, LLC 
+// sexy : 2013-09-11 Uniregistry,Corp. 
+// menu : 2013-09-11 Wedding TLD2, LLC 
+// xn--rhqv96g : 2013-09-11 Stable Tone Limited 
+// uno : 2013-09-11 Dot Latin, LLC 
+// gallery : 2013-09-13 Sugar House, LLC 
+// technology : 2013-09-13 Auburn Falls 
+// xn--3bst00m : 2013-09-13 Eagle Horizon Limited 
+// reviews : 2013-09-13 Extra Cover, LLC 
+// guide : 2013-09-13 Snow Moon, LLC 
+// xn--6qq986b3x1 : 2013-09-13 Tycoon Treasure Limited 
+// graphics : 2013-09-13 Over Madison, LLC 
+// construction : 2013-09-13 Fox Dynamite, LLC 
+// onl : 2013-09-16 I-Registry Ltd. 
+// xn--q9jyb4c : 2013-09-17 Charleston Road Registry 
+// diamonds : 2013-09-23 John Edge, LLC 
+// kiwi : 2013-09-23 Dot Kiwi Limited 
+// enterprises : 2013-09-23 Snow Oaks LLC 
+// today : 2013-09-23 Pearl Woods, LLC 
+// futbol : 2013-09-23 Atomic Falls, LLC 
+// photography : 2013-09-23 Sugar Glen, LLC 
+// tips : 2013-09-23 Corn Willow, LLC 
+// directory : 2013-09-23 Extra Madison, LLC 
+// kitchen : 2013-09-23 Just Goodbye, LLC 
+// xn--6frz82g : 2013-09-24 Afilias Limited 
+// kim : 2013-09-24 Afilias Limited 
+// xn--cg4bki : 2013-09-27 Samsung SDS Co., LTD 
+// monash : 2013-10-01 Monash University 
+// wed : 2013-10-02 Atgron, Inc. 
+// pink : 2013-10-02 Afilias Limited 
+// ruhr : 2013-10-02 regiodot GmbH & Co. KG 
+// buzz : 2013-10-03 DOTSTRATEGY CO. 
+// careers : 2013-10-03 Wild Corner, LLC 
+// shoes : 2013-10-03 Binky Galley, LLC 
+// xn--4gbrim : 2013-10-07 Suhub Electronic Establishment 
+// career : 2013-10-09 dotCareer, LLC 
+// otsuka : 2013-10-11 Otsuka Holdings Co. Ltd. 
+// xn--fiQ64b : 2013-10-14 CITIC Group Corporation 
 // ===END ICANN DOMAINS===
 // ===BEGIN PRIVATE DOMAINS===
 // Amazon CloudFront : https://aws.amazon.com/cloudfront/
@@ -711,17 +769,14 @@ $tldTree = array('ac' => array('com' => array(),
 'pb' => array(),
 'it' => array()),
 'aq' => array(),
-'ar' => array('*' => array(),
-'congresodelalengua3' => array('!' => ''),
-'educ' => array('!' => ''),
-'gobiernoelectronico' => array('!' => ''),
-'mecon' => array('!' => ''),
-'nacion' => array('!' => ''),
-'nic' => array('!' => ''),
-'promocion' => array('!' => ''),
-'retina' => array('!' => ''),
-'uba' => array('!' => ''),
-'com' => array('blogspot' => array())),
+'ar' => array('com' => array('blogspot' => array()),
+'edu' => array(),
+'gob' => array(),
+'int' => array(),
+'mil' => array(),
+'net' => array(),
+'org' => array(),
+'tur' => array()),
 'arpa' => array('e164' => array(),
 'in-addr' => array(),
 'ip6' => array(),
@@ -4498,12 +4553,15 @@ $tldTree = array('ac' => array('com' => array(),
 'info' => array(),
 'other' => array(),
 'store' => array()),
-'ng' => array('ac' => array(),
-'com' => array(),
+'ng' => array('com' => array(),
 'edu' => array(),
-'gov' => array(),
+'name' => array(),
 'net' => array(),
-'org' => array()),
+'org' => array(),
+'sch' => array(),
+'gov' => array(),
+'mil' => array(),
+'mobi' => array()),
 'ni' => array('*' => array()),
 'nl' => array('bv' => array(),
 'co' => array(),
@@ -5255,7 +5313,15 @@ $tldTree = array('ac' => array('com' => array(),
 'shacknet' => array()),
 'nz' => array('*' => array(),
 'co' => array('blogspot' => array())),
-'om' => array('*' => array(),
+'om' => array('co' => array(),
+'com' => array(),
+'edu' => array(),
+'gov' => array(),
+'med' => array(),
+'museum' => array(),
+'net' => array(),
+'org' => array(),
+'pro' => array(),
 'mediaphone' => array('!' => ''),
 'nawrastelecom' => array('!' => ''),
 'nawras' => array('!' => ''),
@@ -5882,7 +5948,11 @@ $tldTree = array('ac' => array('com' => array(),
 'saotome' => array(),
 'store' => array()),
 'su' => array(),
-'sv' => array('*' => array()),
+'sv' => array('com' => array(),
+'edu' => array(),
+'gob' => array(),
+'org' => array(),
+'red' => array()),
 'sx' => array('gov' => array()),
 'sy' => array('edu' => array(),
 'gov' => array(),
@@ -6380,5 +6450,64 @@ $tldTree = array('ac' => array('com' => array(),
 'ye' => array('*' => array()),
 'za' => array('*' => array()),
 'zm' => array('*' => array()),
-'zw' => array('*' => array()));
+'zw' => array('*' => array()),
+'онлайн' => array(),
+'сайт' => array(),
+'شبكة' => array(),
+'游戏' => array(),
+'企业' => array(),
+'camera' => array(),
+'clothing' => array(),
+'lighting' => array(),
+'singles' => array(),
+'ventures' => array(),
+'voyage' => array(),
+'guru' => array(),
+'holdings' => array(),
+'equipment' => array(),
+'bike' => array(),
+'estate' => array(),
+'tattoo' => array(),
+'在线' => array(),
+'中文网' => array(),
+'land' => array(),
+'plumbing' => array(),
+'contractors' => array(),
+'sexy' => array(),
+'menu' => array(),
+'世界' => array(),
+'uno' => array(),
+'gallery' => array(),
+'technology' => array(),
+'集团' => array(),
+'reviews' => array(),
+'guide' => array(),
+'我爱你' => array(),
+'graphics' => array(),
+'construction' => array(),
+'onl' => array(),
+'みんな' => array(),
+'diamonds' => array(),
+'kiwi' => array(),
+'enterprises' => array(),
+'today' => array(),
+'futbol' => array(),
+'photography' => array(),
+'tips' => array(),
+'directory' => array(),
+'kitchen' => array(),
+'移动' => array(),
+'kim' => array(),
+'삼성' => array(),
+'monash' => array(),
+'wed' => array(),
+'pink' => array(),
+'ruhr' => array(),
+'buzz' => array(),
+'careers' => array(),
+'shoes' => array(),
+'موقع' => array(),
+'career' => array(),
+'otsuka' => array(),
+'中信' => array());
 ?>
