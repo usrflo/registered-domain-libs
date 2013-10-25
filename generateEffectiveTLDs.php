@@ -160,6 +160,7 @@ foreach ($lines as $line) {
 	if ($line == "") {
 		if ($licence) {
 			$licence = FALSE;
+			echo "\n";
 		}
 		continue;
 	}
