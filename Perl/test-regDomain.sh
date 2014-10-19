@@ -3,5 +3,5 @@ FQDNS="registered.com sub.registered.com parliament.uk sub.registered.valid.uk r
 echo '### INPUT ###';
 echo $FQDNS | sed 's/ /\n/g';
 
-echo '### OUTPUT ###';
+echo '\n### OUTPUT ###';
 perl test-regDomain.pl $FQDNS
