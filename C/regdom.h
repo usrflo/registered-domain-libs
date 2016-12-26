@@ -20,40 +20,17 @@
  *
  */
 
-#ifndef _DKIM_REGDOM_H_
-#define _DKIM_REGDOM_H_
+#ifndef _REGDOM_H_
+#define _REGDOM_H_
 
-/* DATA TYPES */
-struct tldnode_el {
-	char* dom;
-	char* attr;
+/* public API */
 
-	int num_children;
-	struct tldnode_el** subnodes;
-};
+extern void *loadTldTree(void);
+extern void freeTldTree(void *tree);
+extern void printTldTree(const void *tree, const char *prefix);
 
-typedef struct tldnode_el tldnode;
+extern char *getRegisteredDomain(const char *hostname, const void *tree);
+extern char *getRegisteredDomainDrop(const char *hostname, const void *tree,
+                                     int drop_unknown);
 
-struct dlist_el {
-	char* val;
-
-	struct dlist_el* next;
-};
-
-typedef struct dlist_el dlist;
-
-/* PROTOTYPES */
-extern int readTldString(tldnode*,char*,int,int);
-extern tldnode* findTldNode(tldnode*,char*);
-extern char* concatDomLabel(char*,char*);
-extern char* findRegisteredDomain(tldnode*,dlist*);
-extern void freeDomLabels(dlist*,char*);
-extern tldnode* readTldTree(char*);
-extern char* getRegisteredDomain(char*,tldnode*);
-extern void freeTldTree(tldnode*);
-
-#ifdef DEBUG
-extern void printTldTree(tldnode*, const char *);
-#endif /* DEBUG */
-
-#endif /*_DKIM_REGDOM_H_*/
+#endif /*_REGDOM_H_*/

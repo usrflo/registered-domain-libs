@@ -156,29 +156,27 @@ $licence = TRUE;
 if ($format == "php") echo "<?php\n";
 
 foreach ($lines as $line) {
-
-	if ($licence && startsWith($line, "//")) {
-
-		if ($format == "perl") {
-			echo "# ".substr($line, 2)."\n";
-		} else {
-			echo $line."\n";
-		}
-
-		if (startsWith($line, "// ***** END LICENSE BLOCK")) {
+	$line = trim($line);
+	if ($line == "") {
+		if ($licence) {
 			$licence = FALSE;
 			echo "\n";
 		}
 		continue;
 	}
-
-	if (startsWith($line, "//") || $line == '') {
+	if (startsWith($line, "//")) {
+		if ($licence) {
+			if ($format == "perl") {
+				echo "# ".substr($line, 2)."\n";
+			} else {
+				echo $line."\n";
+			}
+		}
 		continue;
 	}
 
 	// this must be a TLD
 	$tldParts = split('\.', $line);
-
 	buildSubdomain($tldTree, $tldParts);
 }
 
@@ -197,7 +195,7 @@ $tldTree = array(
 
 if ($format == "c") {
 
-	echo "char* tldString = \"";
+	echo "static const char tldString[] = \"";
 	printNode_C("root", $tldTree);
 	echo "\";\n\n";
 
@@ -208,7 +206,7 @@ if ($format == "c") {
 	}
 	printNode("\$tldTree", $tldTree, TRUE);
 	echo ";\n";
-	if ($format == "php") echo '?>';
+	if ($format == "php") echo '?>' . "\n";
 
 }
 

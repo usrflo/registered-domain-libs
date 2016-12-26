@@ -35,79 +35,32 @@
  * $signingDomain has to be provided lowercase (!)
  */
 
+/* pull in class */
+require_once(dirname(__FILE__) . '/regDomain.class.php');
+
+/* create global object */
+$regDomainObj = new regDomain;
+
 function getRegisteredDomain($signingDomain, $fallback = TRUE) {
-
-	global $tldTree;
-
-	$signingDomainParts = split('\.', $signingDomain);
-
-	$result = findRegisteredDomain($signingDomainParts, $tldTree);
-
-	if ($result===NULL || $result=="") {
-		// this is an invalid domain name
-		return NULL;
-	}
-
-	// assure there is at least 1 TLD in the stripped signing domain
-	if (!strpos($result, '.')) {
-		if ($fallback===FALSE) {
-			return NULL;
-		}
-		$cnt = count($signingDomainParts);
-		if ($cnt==1 || $signingDomainParts[$cnt-2]=="") return NULL;
-		if (!validDomainPart($signingDomainParts[$cnt-2]) || !validDomainPart($signingDomainParts[$cnt-1])) return NULL;
-		return $signingDomainParts[$cnt-2].'.'.$signingDomainParts[$cnt-1];
-	}
-	return $result;
+	/* pull in object */
+	global $regDomainObj;
+	/* return object method */
+	return $regDomainObj->getRegisteredDomain($signingDomain, $fallback);
 }
 
 function validDomainPart($domPart) {
-	// see http://www.register.com/domain-extension-rules.rcmx
-	
-	$len = strlen($domPart);
-
-	// not more than 63 characters
-	if ($len>63) return FALSE;
-
-	// not less than 1 characters --> there are TLD-specific rules that could be considered additionally
-	if ($len<1) return FALSE;
-	
-	// Use only letters, numbers, or hyphen ("-")
-	// not beginning or ending with a hypen (this is TLD specific, be aware!)
-	if (!preg_match("/^([a-z0-9])(([a-z0-9-])*([a-z0-9]))*$/", $domPart)) return FALSE;
-
-	return TRUE;
+	/* pull in object */
+	global $regDomainObj;
+	/* return object method */
+	return $regDomainObj->validDomainPart($domPart);
 }
 
 // recursive helper method
 function findRegisteredDomain($remainingSigningDomainParts, &$treeNode) {
-
-	$sub = array_pop($remainingSigningDomainParts);
-
-	$result = NULL;
-	if (isset($treeNode['!'])) {
-		return '#';
-	}
-	
-	if (!validDomainPart($sub)) {
-		return NULL;
-	}
-
-	if (is_array($treeNode) && array_key_exists($sub, $treeNode)) {
-		$result = findRegisteredDomain($remainingSigningDomainParts, $treeNode[$sub]);
-	} else if (is_array($treeNode) && array_key_exists('*', $treeNode)) {
-		$result = findRegisteredDomain($remainingSigningDomainParts, $treeNode['*']);
-	} else {
-		return $sub;
-	}
-
-	// this is a hack 'cause PHP interpretes '' as NULL
-	if ($result == '#') {
-		return $sub;
-	} else if (strlen($result)>0) {
-		return $result.'.'.$sub;
-	}
-	return NULL;
+	/* pull in object */
+	global $regDomainObj;
+	/* return object method */
+	return $regDomainObj->findRegisteredDomain($remainingSigningDomainParts, $treeNode);
 }
 
 ?>
