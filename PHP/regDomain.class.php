@@ -70,14 +70,11 @@ class regDomain {
 
 		// not more than 63 characters
 		if ($len>63) return FALSE;
-
 		// not less than 1 characters --> there are TLD-specific rules that could be considered additionally
 		if ($len<1) return FALSE;
-
 		// Use only letters, numbers, or hyphen ("-")
 		// not beginning or ending with a hypen (this is TLD specific, be aware!)
 		if (!preg_match("/^([a-z0-9])(([a-z0-9-])*([a-z0-9]))*$/", $domPart)) return FALSE;
-
 		return TRUE;
 	}
 
@@ -114,12 +111,7 @@ class regDomain {
 	/* load tld tree into object */
 	function __construct() {
 		/* include tld tree data */
-		include(dirname(__FILE__) . '/effectiveTLDs.inc.php');
+		include(__DIR__ . '/effectiveTLDs.inc.php');
 		$this->tldTree = $tldTree;
-
 	}
-
 }
-
-?>
-

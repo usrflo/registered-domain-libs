@@ -36,9 +36,7 @@ function endsWith($search, $endstring) {
 	return (substr($search, -strlen($endstring))==$endstring);
 }
 
-
 function buildSubdomain(&$node, $tldParts) {
-
 	$dom = trim(array_pop($tldParts));
 
 	$isNotDomain = FALSE;
@@ -61,7 +59,6 @@ function buildSubdomain(&$node, $tldParts) {
 }
 
 function printNode($key, $valueTree, $isAssignment = false) {
-
 	global $format;
 
 	if ($isAssignment) {
@@ -90,7 +87,6 @@ function printNode($key, $valueTree, $isAssignment = false) {
 	$keys = array_keys($valueTree);
 
 	for ($i=0; $i<count($keys); $i++) {
-
 		$key = $keys[$i];
 
 		printNode($key, $valueTree[$key]);
@@ -112,21 +108,17 @@ function printNode($key, $valueTree, $isAssignment = false) {
 // sample: root(3:ac(5:com,edu,gov,net,ad(3:nom,co!,*)),de,com)
 
 function printNode_C($key, $valueTree) {
-
 	echo "$key";
 
 	$keys = array_keys($valueTree);
 
 	if (count($keys)>0) {
-
 		if (strcmp($keys['!'], "!")==0) {
 			echo "!";
 		} else {
-
 			echo "(".count($keys).":";
 
 			for ($i=0; $i<count($keys); $i++) {
-
 				$key = $keys[$i];
 
 				// if (count($valueTree[$key])>0) {
@@ -194,20 +186,13 @@ $tldTree = array(
 */
 
 if ($format == "c") {
-
 	echo "static const char tldString[] = \"";
 	printNode_C("root", $tldTree);
 	echo "\";\n\n";
-
 } else {
-
 	if ($format == "perl") {
 		print "package effectiveTLDs;\n\n";
 	}
 	printNode("\$tldTree", $tldTree, TRUE);
 	echo ";\n";
-	if ($format == "php") echo '?>' . "\n";
-
 }
-
-?>

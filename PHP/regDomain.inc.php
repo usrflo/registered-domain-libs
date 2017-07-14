@@ -36,7 +36,7 @@
  */
 
 /* pull in class */
-require_once(dirname(__FILE__) . '/regDomain.class.php');
+require_once(__DIR__ . '/regDomain.class.php');
 
 /* create global object */
 $regDomainObj = new regDomain;
@@ -62,5 +62,3 @@ function findRegisteredDomain($remainingSigningDomainParts, &$treeNode) {
 	/* return object method */
 	return $regDomainObj->findRegisteredDomain($remainingSigningDomainParts, $treeNode);
 }
-
-?>
