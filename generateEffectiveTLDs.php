@@ -11,10 +11,6 @@
 
 header('Content-Type: text/html; charset=utf-8');
 
-<<<<<<< HEAD
-// DEFINE('URL', 'http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1');
-=======
->>>>>>> e625649eb989e7f07cc046cd8b48fa4733230104
 DEFINE('URL', 'https://publicsuffix.org/list/effective_tld_names.dat');
 
 $format = "php";
