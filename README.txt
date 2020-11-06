@@ -5,14 +5,15 @@ Detection of registered domains by reg-dom libs
 The reg-dom libs are available in C, Perl and PHP so far.
 
 They include recent representations of the effective TLD list available at
-http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1
+https://publicsuffix.org/list/effective_tld_names.dat
 and help to convert an arbitrary domain name to the registered domain name.
 
 Sample use:
 dkim-reputation.org blocks signing domains on the level of registered domains
 to rate senders who use e.g. a.spamdomain.tld, b.spamdomain.tld, ... under
 the most common identifier - the registered domain - finally.
-Project page: http://www.dkim-reputation.org/regdom-libs/
+Project page: https://www.agitos.de/registered-domain-libs/
+Updated library downloads: https://services.agitos.de/regdom-lib-downloads/
 
 Pseudo code:
 registeredDomain = getRegisteredDomain(ingoingDomain);
