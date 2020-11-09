@@ -150,7 +150,7 @@ error_reporting(E_ERROR);
 $tldTree = array();
 $list = file_get_contents(URL);
 // $list = "bg\na.bg\n0.bg\n!c.bg\n";
-$lines = split("\n", $list);
+$lines = explode("\n", $list);
 $licence = TRUE;
 
 if ($format == "php") echo "<?php\n";
