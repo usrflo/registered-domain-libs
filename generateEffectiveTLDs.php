@@ -176,7 +176,7 @@ foreach ($lines as $line) {
 	}
 
 	// this must be a TLD
-	$tldParts = split('\.', $line);
+	$tldParts = explode('.', $line);
 	buildSubdomain($tldTree, $tldParts);
 }
 
