@@ -38,7 +38,6 @@ $argc = $_SERVER["argc"];
 $argv = $_SERVER["argv"];
 
 for ($i=1; $i<$argc; $i++) {
-
 	$registeredDomain = getRegisteredDomain($argv[$i], $tldTree);
 
 	if ( $registeredDomain === NULL ) {
@@ -47,5 +46,3 @@ for ($i=1; $i<$argc; $i++) {
 		printf("%s\n", $registeredDomain);
 	}
 }
-
-?>
