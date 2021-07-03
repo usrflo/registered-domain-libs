@@ -43,10 +43,10 @@ b.example.uk.com: example.uk.com
 a.b.example.uk.com: example.uk.com
 test.ac: test.ac
 # TLD with only 1 (wildcard) rule.
-cy: error
-c.cy: error
-b.c.cy: b.c.cy
-a.b.c.cy: b.c.cy
+mm: error
+c.mm: error
+b.c.mm: b.c.mm
+a.b.c.mm: b.c.mm
 # More complex TLD.
 jp: error
 test.jp: test.jp
