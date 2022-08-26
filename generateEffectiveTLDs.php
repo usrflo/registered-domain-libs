@@ -129,9 +129,9 @@ function printNode_C($key, $valueTree) {
 
 				$key = $keys[$i];
 
-				// if (count($valueTree[$key])>0) {
+				if (is_array($valueTree[$key])) {
 					printNode_C($key, $valueTree[$key]);
-				// }
+				}
 
 				if ($i+1 != count($valueTree)) {
 					echo ",";
