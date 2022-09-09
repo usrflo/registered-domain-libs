@@ -120,6 +120,3 @@ class regDomain {
 	}
 
 }
-
-?>
-

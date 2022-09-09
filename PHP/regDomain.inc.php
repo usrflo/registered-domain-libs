@@ -62,5 +62,3 @@ function findRegisteredDomain($remainingSigningDomainParts, &$treeNode) {
 	/* return object method */
 	return $regDomainObj->findRegisteredDomain($remainingSigningDomainParts, $treeNode);
 }
-
-?>

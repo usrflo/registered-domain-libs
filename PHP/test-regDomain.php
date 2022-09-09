@@ -47,5 +47,3 @@ for ($i=1; $i<$argc; $i++) {
 		printf("%s\n", $registeredDomain);
 	}
 }
-
-?>
