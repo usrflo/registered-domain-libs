@@ -119,7 +119,7 @@ function printNode_C($key, $valueTree) {
 
 	if (count($keys)>0) {
 
-		if (strcmp($keys['!'], "!")==0) {
+		if (strcmp($keys[0], "!")==0) {
 			echo "!";
 		} else {
 
@@ -129,9 +129,7 @@ function printNode_C($key, $valueTree) {
 
 				$key = $keys[$i];
 
-				// if (count($valueTree[$key])>0) {
-					printNode_C($key, $valueTree[$key]);
-				// }
+				printNode_C($key, $valueTree[$key]);
 
 				if ($i+1 != count($valueTree)) {
 					echo ",";
