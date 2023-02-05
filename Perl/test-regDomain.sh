@@ -4,4 +4,4 @@ echo '### INPUT ###';
 echo $FQDNS | sed 's/ /\n/g';
 
 echo '\n### OUTPUT ###';
-perl test-regDomain.pl $FQDNS
+perl -I. test-regDomain.pl $FQDNS

@@ -120,7 +120,7 @@ function printNode_C($key, $valueTree) {
 	if (count($keys)>0) {
 
 		if (strcmp($keys[0], "!")==0) {
-			echo "!";
+			echo "(1:!)";
 		} else {
 
 			echo "(".count($keys).":";
