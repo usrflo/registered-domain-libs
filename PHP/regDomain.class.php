@@ -115,6 +115,8 @@ class regDomain {
 	function __construct() {
 		/* include tld tree data */
 		include(dirname(__FILE__) . '/effectiveTLDs.inc.php');
+		$this->tldTree = $tldTree;
+
 	}
 
 }

@@ -11,7 +11,7 @@
 
 header('Content-Type: text/html; charset=utf-8');
 
-DEFINE('URL', 'http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1');
+DEFINE('URL', 'https://publicsuffix.org/list/effective_tld_names.dat');
 
 $format = "php";
 if ($_SERVER['argc']>1) {
@@ -150,7 +150,7 @@ error_reporting(E_ERROR);
 $tldTree = array();
 $list = file_get_contents(URL);
 // $list = "bg\na.bg\n0.bg\n!c.bg\n";
-$lines = split("\n", $list);
+$lines = explode("\n", $list);
 $licence = TRUE;
 
 if ($format == "php") echo "<?php\n";
@@ -176,7 +176,7 @@ foreach ($lines as $line) {
 	}
 
 	// this must be a TLD
-	$tldParts = split('\.', $line);
+	$tldParts = explode('.', $line);
 	buildSubdomain($tldTree, $tldParts);
 }
 
