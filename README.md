@@ -6,6 +6,7 @@ They include recent representations of the effective TLD list available at
 https://publicsuffix.org/list/effective_tld_names.dat
 and help to convert an arbitrary domain name to the registered domain name.
 Upon changes of `effective_tld_names.dat` this git repository is automatically updated once a day.
+The library supports Unicode (IDN notation) for domain name input and output. ACE notation is not supported currently.
 
 ### Sample Use
 Signing domains in DKIM signatures can be used on the level of registered domains
